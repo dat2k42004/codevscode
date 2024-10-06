@@ -1,24 +1,35 @@
-f = [0] * (10 ** 18 + 1)
-l = []
-def init () :
-    for i in range(2, 10 ** 9 + 1) :
-        if f[i] == 0 :
-            for j in range(i * i, 10 ** 18 + 1, i):
-                f[j] = i
-    l.append(1)
-    for i in range(2, 10 ** 18 + 1) :
-        if f[i] == 0 :
-            f[i] = i
-        if f[i] <= 5 :
-            l.append(i)
+m = {1 : 1}
 
+while True :
+    a = []
+    ok = False
+    
+    for i in m :
+        if i < 10 ** 18 :
+            if i * 2 not in m :
+                a.append(i * 2)
+            if i * 3 not in m :
+                a.append(i * 3)
+            if i * 5 not in m :
+                a.append(i * 5)
+    for i in a :
+        ok = True
+        m[i] = 1
+    if not(ok) :
+        break
 
-init()
+res = 1
+a = sorted(m.keys())
+
+for i in a :
+    m[i] = res 
+    res += 1
+
 
 for i in range(int(input())) :
     n = int(input()) 
-    if f[n] <= 5 :
-        print(l.index(n) + 1)
+    if n in m:
+        print(m[n])
         
     else :
         print('Not in sequence')

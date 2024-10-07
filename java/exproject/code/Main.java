@@ -21,7 +21,8 @@ public class Main {
 //        new mouselistener();
 //        new keybindings();
 //        new graphics();
-        new amination2d();
+        // new amination2d();
+        new texteditor();
 
 
 //        Planet planet = Planet.earth;

@@ -1,10 +1,11 @@
+package calculator_app;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 public class calculator_app  implements ActionListener {
-
+    /* create */
     JFrame frame;
     JTextField textField;
     JButton[] numbers = new JButton[10];
@@ -17,6 +18,7 @@ public class calculator_app  implements ActionListener {
     char operator = '#', operator2 = '#';
     boolean flag = false;
     Font font = new Font("Ink Free", Font.BOLD, 30);
+    /* create */
 
     calculator_app () {
         frame = new JFrame("Calculator");
@@ -142,6 +144,7 @@ public class calculator_app  implements ActionListener {
                                        case '*': num1 *= num2; break;
                                        case '/': num1 /= num2; break;
                                        case '%': num1 %= num2; break;
+                                       case '#': num1 = num2; break;
                                    }
                                    num2 = 0;
                             break;
@@ -178,6 +181,7 @@ public class calculator_app  implements ActionListener {
                                         case '*': num1 *= num2; break;
                                         case '/': num1 /= num2; break;
                                         case '%': num1 %= num2; break;
+                                        case '#': num1 = num2; break;
                                     }
                                     num2 = 0;
                             break;
@@ -214,6 +218,7 @@ public class calculator_app  implements ActionListener {
                                         case '*': num1 *= num2; break;
                                         case '/': num1 /= num2; break;
                                         case '%': num1 %= num2; break;
+                                        case '#': num1 = num2; break;
                                     }
                                     num2 = 0;
                             break;
@@ -250,6 +255,7 @@ public class calculator_app  implements ActionListener {
                                         case '*': num1 *= num2; break;
                                         case '/': num1 /= num2; break;
                                         case '%': num1 %= num2; break;
+                                        case '#': num1 = num2; break;
                                     }
                                     num2 = 0;
                             break;
@@ -286,6 +292,7 @@ public class calculator_app  implements ActionListener {
                                         case '*': num1 *= num2; break;
                                         case '/': num1 /= num2; break;
                                         case '%': num1 %= num2; break;
+                                        case '#': num1 = num2; break;
                                     }
                                     num2 = 0;
                             break;
@@ -299,7 +306,7 @@ public class calculator_app  implements ActionListener {
             if (operator == '#') {
                 String tmp = textField.getText();
                 if (!tmp.equals(""))
-                    num1 = Double.parseDouble(tmp);
+                    num2 = Double.parseDouble(tmp);
             }
             else {
                 String tmp = textField.getText();
@@ -318,6 +325,8 @@ public class calculator_app  implements ActionListener {
         }
         if (e.getSource() == equ) {
             switch (operator) {
+                case '#': num1 = Double.parseDouble(textField.getText());
+                    break;
                 case '+': num1 = num1 + Double.parseDouble(textField.getText());
                     break;
                 case '-': num1 = num1 - Double.parseDouble(textField.getText());
@@ -335,6 +344,7 @@ public class calculator_app  implements ActionListener {
                             case '*': num1 *= num2; break;
                             case '/': num1 /= num2; break;
                             case '%': num1 %= num2; break;
+                            case '#': num1 = num2; break;
                         }
                         num2 = 0;
                     break;
@@ -344,7 +354,7 @@ public class calculator_app  implements ActionListener {
             else
                 textField.setText(String.valueOf(num1));
             operator = '#';
-            num2 = 0;
+            operator2 = '#';
 //            num1 = result;
         }
         if (e.getSource() == clr) {
@@ -352,6 +362,7 @@ public class calculator_app  implements ActionListener {
             num1 = 0;
             num2 = 0;
             operator = '#';
+            operator2 = '#';
             flag = false;
         }
         if(e.getSource() == del) {

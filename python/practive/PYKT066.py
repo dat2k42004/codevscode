@@ -1,8 +1,4 @@
-def gcd(a, b) :
-    if b == 0 :
-        return a
-    else :
-        return gcd(b, a % b)
+import math
 for i in range(int(input())) :
     n, k = map(int, input().split())
     a = []
@@ -12,18 +8,27 @@ for i in range(int(input())) :
         if len(a) == n  :
             break
     
-    if k in a :
-        print(1)
-    else :
-        ok = False
-        for i in range(n - 1) :
-            if gcd(a[i], a[i + 1]) == k :
+    ok = False
+    cnt = n
+    for i in range(n) :
+        current = a[i]
+        
+        if current == k :
+            ok = True
+            cnt = min(cnt, 1)
+            break
+        for j in range(i + 1, n) :
+            current = math.gcd(current, a[j])
+            
+            if current == k :
+                cnt = min(cnt, j - i + 1)
                 ok = True
+            elif current < k :
                 break
-            
-        if ok :
-            print(2)
-        else :
-            print(-1)
-            
+    if ok :
+        print(cnt) 
+    else :
+        print(-1)
+
+ 
             

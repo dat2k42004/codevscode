@@ -1,19 +1,19 @@
-for i in range(int(input())) :
+def mind(s, i):
+    ans = i
+    for j in range(i+1, len(s)):
+        if s[j] < s[i]:
+            if ans == i: ans = j
+            elif s[ans] < s[j]: ans = j
+    if s[ans] < s[i]: return ans
+    return -1
+for t in range(int(input())):
     s = input()
-    a = [int(x) for x in s]
-    ok = False
-    for i in range(len(a) - 1, 0, -1) :
-        if a[i] < a[i - 1] :
-            res = a[i]
-            a[i] = a[i - 1]
-            a[i - 1] = res
-            ok = True
+    n = len(s)
+    ans = ''
+    for i in range(n-1, -1, -1):
+        ind = mind(s, i)
+        if ind > -1:
+            ans = s[:i] + s[ind] + s[i+1:ind] + s[i] + s[ind+1:]
             break
-    if ok and a[0] != 0 :
-        for i in a :
-            print(i, end = '')
-        print()
-    else :
-        print(-1)
-    
-
+    if ans!='' and ans!=s and ans[0]!='0': print(ans)
+    else: print('-1')

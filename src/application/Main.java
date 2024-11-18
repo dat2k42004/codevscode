@@ -5,10 +5,12 @@ package application;
 //import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 //import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 //import javafx.scene.control.Alert;
@@ -69,31 +71,42 @@ public class Main extends Application {
 //		Parent root = FXMLLoader.load(getClass().getResource("slider.fxml"));
 //		Parent root = FXMLLoader.load(getClass().getResource("progressbar.fxml"));
 //		Parent root = FXMLLoader.load(getClass().getResource("menubar.fxml"));
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("scene.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("mp3.fxml"));
 		Parent root = loader.load();
-		Controller controller = loader.getController();
+//		Controller controller = loader.getController();
 		Scene scene = new Scene(root);
-		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+//		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+//
+//			@Override
+//			public void handle(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				switch (e.getCode()) {
+//					case UP:
+//						controller.moveup();
+//						break;
+//					case DOWN:
+//						controller.movedown();
+//						break;
+//					case LEFT:
+//						controller.moveleft();
+//						break;
+//					case RIGHT:
+//						controller.moveright();
+//						break;
+//					default :
+//						break;
+//				}
+//			}
+//			
+//		});
+		stg.setTitle("MP3");
+		stg.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
 			@Override
-			public void handle(KeyEvent e) {
+			public void handle(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				switch (e.getCode()) {
-					case UP:
-						controller.moveup();
-						break;
-					case DOWN:
-						controller.movedown();
-						break;
-					case LEFT:
-						controller.moveleft();
-						break;
-					case RIGHT:
-						controller.moveright();
-						break;
-					default :
-						break;
-				}
+				Platform.exit();
+				System.exit(0);
 			}
 			
 		});

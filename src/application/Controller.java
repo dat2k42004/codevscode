@@ -1,13 +1,23 @@
 package application;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,6 +28,7 @@ import javafx.scene.control.Button;
 //import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -26,16 +37,265 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 //import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
+import javafx.scene.transform.Rotate;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebHistory;
+import javafx.scene.web.WebView;
+import javafx.util.Duration;
 //import javafx.scene.layout.AnchorPane;
 //import javafx.scene.shape.Circle;
 //import javafx.stage.Stage;
 
 public class Controller implements Initializable {
+	
+	
+	@FXML 
+	private Pane pane;
+	@FXML
+	private Label label;
+	@FXML
+	Button play, reset, pause, previous, next;
+	@FXML
+	ComboBox<String> speed;
+	@FXML
+	Slider volume;
+	@FXML
+	ProgressBar progress;
+	
+	File directory;
+	File[] files;
+	ArrayList<File> songs;
+	int songnumber = 0;
+	int[] speeds = {25, 50, 75, 100, 125, 150, 175, 200};
+	Timer timer;
+	TimerTask task;
+	boolean running;
+	
+	
+	Media media;
+	MediaPlayer mediaplayer;
+ 
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		// TODO Auto-generated method stub
+		songs = new ArrayList<File>();
+		directory = new File("music");
+		files = directory.listFiles();
+		
+		if (files != null) {
+			for (File file : files) {
+				songs.add(file);
+				System.out.println(file);
+			}
+		}
+		media = new Media(songs.get(songnumber).toURI().toString());
+		mediaplayer = new MediaPlayer(media);
+		label.setText(songs.get(songnumber).getName());
+		playpage();
+		
+		for (int i = 0; i < speeds.length; ++ i) {
+			speed.getItems().add(Integer.toString(speeds[i]) + "%");
+		}
+		
+		volume.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				// TODO Auto-generated method stub
+				mediaplayer.setVolume(volume.getValue() * 0.01);
+			}
+			
+		});
+		progress.setStyle("-fx-accent:  #00FF00;");
+	}
+	
+	
+	
+	public void playpage() {
+		begintimer();
+		changespeed(null);
+		mediaplayer.setVolume(volume.getValue() * 0.01);
+		mediaplayer.play();
+	}
+	public void pausepage() {
+		canceltimer();
+		mediaplayer.pause();
+	}
+	public void resetpage() {
+		progress.setProgress(0);
+		mediaplayer.seek(Duration.seconds(0));
+	}
+	public void previouspage() {
+		if (songnumber > 0) {
+			songnumber --;
+		}
+		else {
+			songnumber = songs.size() - 1;
+		}
+		
+		if (running) {
+			canceltimer();
+		}
+		mediaplayer.stop();
+		media = new Media(songs.get(songnumber).toURI().toString());
+		mediaplayer = new MediaPlayer(media);
+		label.setText(songs.get(songnumber).getName());
+		playpage();
+	}
+	public void nextpage() {
+		if (songnumber < songs.size() - 1) {
+			songnumber ++;
+		}
+		else {
+			songnumber = 0;
+		}
+		
+		if (running) {
+			canceltimer();
+		}
+		mediaplayer.stop();
+		media = new Media(songs.get(songnumber).toURI().toString());
+		mediaplayer = new MediaPlayer(media);
+		label.setText(songs.get(songnumber).getName());
+		playpage();
+	}
+	public void changespeed(ActionEvent e) {
+		if (speed.getValue() == null) {
+			mediaplayer.setRate(1);
+		}
+		else {
+			mediaplayer.setRate(Integer.parseInt(speed.getValue().substring(0, speed.getValue().length() - 1)) * 0.01);
+		}
+	}
+	
+	public void begintimer() {
+		timer = new Timer();
+		task = new TimerTask() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				running = true;
+				double current = mediaplayer.getCurrentTime().toSeconds();
+				double end = media.getDuration().toSeconds();
+				System.out.println(current / end);
+				progress.setProgress(current / end);
+				
+				if (current / end == 1) {
+					canceltimer();
+				}
+			}
+			
+		};
+		
+		timer.scheduleAtFixedRate(task, 0, 1000);
+	}
+	public void canceltimer() {
+		running = false;
+		timer.cancel();
+	}
+	
+//	@FXML
+//	private TextField textfield;
+//	@FXML
+//	private WebView webview;
+//	
+//	private WebEngine engine;
+//	private WebHistory history;
+//	private String homepage;
+//	double zoom = 1.0;
+//	@Override
+//	public void initialize(URL arg0, ResourceBundle arg1) {
+//		// TODO Auto-generated method stub
+//		engine = webview.getEngine();
+//		homepage = "www.google.com";
+//		textfield.setText(homepage);
+//		loadpage();
+//	}
+//	
+//	public void loadpage() {
+////		engine.load("http://ww.google.com");
+//		engine.load("http://" + textfield.getText());
+//	}
+//	
+//	public void refreshpage() {
+//		engine.reload();
+//	}
+//	
+//	public void zoomin() {
+//		zoom += 0.25;
+//		webview.setZoom(zoom);
+//	}
+//	public void zoomout() {
+//		zoom -= 0.25;
+//		webview.setZoom(zoom);
+//	}
+//	
+//	public void displayhistory() {
+//		history = engine.getHistory();
+//		ObservableList<WebHistory.Entry> entries = history.getEntries();
+//		for (WebHistory.Entry entry : entries) {
+////			System.out.println(entry);
+//			System.out.println(entry.getUrl() + " " + entry.getLastVisitedDate());
+//		}
+//	}
+//	
+//	public void back() {
+//		history = engine.getHistory();
+//		ObservableList<WebHistory.Entry> entries = history.getEntries();
+//		history.go(-1);
+//		textfield.setText(entries.get(history.getCurrentIndex()).getUrl());
+//	}
+//	
+//	public void forward() {
+//		history = engine.getHistory();
+//		ObservableList<WebHistory.Entry> entries = history.getEntries();
+//		history.go(1);
+//		textfield.setText(entries.get(history.getCurrentIndex()).getUrl());
+//	}
+//	
+//	public void executejs() {
+//		engine.executeScript("window.location = \"https://www.youtube.com\";");
+//	}
+	
+//	@FXML
+//	private MediaView mediaview;
+//	@FXML
+//	private Button playmedia, pausemedia, resetmedia;
+//	
+//	private File file;
+//	private Media media;
+//	private MediaPlayer mediaplayer;
+//
+//	@Override
+//	public void initialize(URL arg0, ResourceBundle arg1) {
+//		// TODO Auto-generated method stub
+//		file = new File("video.mp4");
+//		media = new Media(file.toURI().toString());
+//		mediaplayer = new MediaPlayer(media);
+//		mediaview.setMediaPlayer(mediaplayer);
+//	}
+//	public void play() {
+//		mediaplayer.play();
+//	}
+//	public void pause() {
+//		mediaplayer.pause();
+//	}
+//	public void reset() {
+//		if(mediaplayer.getStatus() != MediaPlayer.Status.READY) {
+//			mediaplayer.seek(Duration.seconds(0.0));
+//		}
+//	}
 	
 	
 //	@FXML
@@ -343,23 +603,69 @@ public class Controller implements Initializable {
 //	public void newMethod() {
 //		System.out.println("hello");
 //	}
-
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+//	@FXML
+//	private ImageView myimage;
+//	
+//	@Override
+//	public void initialize(URL arg0, ResourceBundle arg1) {
+//		// TODO Auto-generated method stub
+//		
+//		//translate
+//		TranslateTransition translate = new TranslateTransition();
+//		translate.setNode(myimage);
+//		translate.setDuration(Duration.millis(1000));
+//		translate.setCycleCount(TranslateTransition.INDEFINITE);
+//		translate.setByX(400);
+////		translate.setByY(250);
+//		translate.setAutoReverse(true);
+//		translate.play();
+//		
+//		//rotate
+//		RotateTransition rotate = new RotateTransition();
+//		rotate.setNode(myimage);
+//		rotate.setDuration(Duration.millis(1000));
+//		rotate.setCycleCount(RotateTransition.INDEFINITE);
+//		rotate.setInterpolator(Interpolator.LINEAR);
+//		rotate.setByAngle(360);
+//		rotate.setAxis(Rotate.Z_AXIS);
+//		rotate.play();
+//		
+//		 // fade
+//		  FadeTransition fade = new FadeTransition();
+//		  fade.setNode(myimage);
+//		  fade.setDuration(Duration.millis(1000));
+//		  fade.setCycleCount(TranslateTransition.INDEFINITE);
+//		  fade.setInterpolator(Interpolator.LINEAR);
+//		  fade.setFromValue(0);
+//		  fade.setToValue(1);
+//		  fade.play();
+//		  
+//		  
+//		  // scale
+//		  ScaleTransition scale = new ScaleTransition();
+//		  scale.setNode(myimage);
+//		  scale.setDuration(Duration.millis(1000));
+//		  scale.setCycleCount(TranslateTransition.INDEFINITE);
+//		  scale.setInterpolator(Interpolator.LINEAR);
+//		  scale.setByX(2.0);
+//		  scale.setByY(2.0);
+//		  scale.setAutoReverse(true);
+//		  scale.play();
 	
-	public void moveup() {
-		System.out.println("MOVE UP");
-	}
-	public void movedown() {
-		System.out.println("MOVE DOWN");
-	}
-	public void moveleft() {
-		System.out.println("MOVE LEFT");
-	}
-	public void moveright() {
-		System.out.println("MOVE RIGHT");
-	}
+		
+//		}
+	
+//	public void moveup() {
+//		System.out.println("MOVE UP");
+//	}
+//	public void movedown() {
+//		System.out.println("MOVE DOWN");
+//	}
+//	public void moveleft() {
+//		System.out.println("MOVE LEFT");
+//	}
+//	public void moveright() {
+//		System.out.println("MOVE RIGHT");
+//	}
 }
+
